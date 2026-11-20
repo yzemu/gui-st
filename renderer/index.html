@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file: data: https: http:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>gui-st</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bg"></div><div id="aurora"><i></i><i></i><i></i></div><canvas id="fxc"></canvas><div id="spot"></div><div id="drag"></div>
+<aside class="side">
+  <div class="brand"><span class="logo">G</span>gui-st</div>
+  <nav id="nav"></nav>
+  <button class="ghost" id="btnSettings">Настройки</button>
+</aside>
+<main>
+  <header>
+    <input id="search" type="search" placeholder="Поиск по библиотеке">
+    <select id="sort">
+      <option value="name">По названию</option>
+      <option value="last">Недавно играл</option>
+      <option value="time">По времени игры</option>
+      <option value="added">Недавно добавлены</option>
+    </select>
+    <button class="ghost" id="btnScan">Найти игры</button>
+    <button class="primary" id="btnAdd">Добавить игру</button>
+  </header>
+  <section class="stats" id="stats"></section>
+  <section class="grid" id="grid"></section>
+</main>
+
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <h2 id="dlgTitle">Новая игра</h2>
+    <label>Название<input id="fName" required></label>
+    <label>Лаунчер<select id="fLauncher"></select></label>
+    <label>Файл запуска или ссылка
+      <div class="row"><input id="fPath" placeholder="C:\Games\game.exe или steam://rungameid/570" required><button type="button" class="ghost" id="pickExe">Обзор</button></div>
+    </label>
+    <label>Аргументы запуска (необязательно)<input id="fArgs"></label>
+    <label>Обложка
+      <div class="row"><input id="fCover" placeholder="Ссылка на картинку или файл"><button type="button" class="ghost" id="pickCover">Выбрать</button></div>
+    </label>
+    <label>Категория<input id="fCat" list="cats" placeholder="Например: RPG"></label>
+    <datalist id="cats"></datalist>
+    <label class="check"><input type="checkbox" id="fFav">В избранное</label>
+    <div class="actions">
+      <button type="button" class="danger" id="btnDel">Удалить</button>
+      <span class="spacer"></span>
+      <button type="button" class="ghost" id="btnCancel">Отмена</button>
+      <button class="primary" id="btnSave" type="submit">Сохранить</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgSet" class="wide">
+  <h2>Настройки</h2>
+  <div class="tabs"><button data-t="look" class="on">Оформление</button><button data-t="fx">Эффекты</button><button data-t="lib">Библиотека</button><button data-t="upd">Обновления</button></div>
+  <div class="pane" data-p="look">
+    <div class="presets" id="presets"></div>
+    <div class="grid2">
+      <label>Акцент 1<input type="color" id="tA"></label>
+      <label>Акцент 2<input type="color" id="tB"></label>
+      <label>Цвет фона<input type="color" id="tBg"></label>
+      <label>Шрифт<select id="tFont"><option value='"Segoe UI Variable"'>Segoe UI</option><option>Bahnschrift</option><option value='"Trebuchet MS"'>Trebuchet</option><option>Georgia</option><option>Consolas</option><option>Impact</option></select></label>
+      <label>Размер карточек<input type="range" id="tSize" min="130" max="260"></label>
+      <label>Скругление<input type="range" id="tRad" min="0" max="28"></label>
+      <label>Масштаб интерфейса<input type="range" id="tScale" min="80" max="130"></label>
+      <label>Стиль карточек<select id="tStyle"><option value="classic">Классика</option><option value="poster">Постер</option></select></label>
+      <label>Яркость фона-картинки<input type="range" id="tBgOp" min="0" max="100"></label>
+      <label>Размытие фона-картинки<input type="range" id="tBlur" min="0" max="30"></label>
+    </div>
+    <label class="check"><input type="checkbox" id="tGlass">Стеклянные панели</label>
+    <label class="check"><input type="checkbox" id="tList">Показывать списком</label>
+    <div class="row"><button class="ghost" id="tBgPick">Фоновая картинка</button><button class="ghost" id="tBgClear">Убрать фон</button><button class="ghost" id="tReset">Сбросить всё</button></div>
+  </div>
+  <div class="pane" data-p="fx" hidden>
+    <label>Сила эффектов<input type="range" id="tLevel" min="0" max="100"></label>
+    <label class="check"><input type="checkbox" id="tAnim">Анимации интерфейса</label>
+    <label class="check"><input type="checkbox" data-fx="aurora">Северное сияние (живой фон)</label>
+    <label class="check"><input type="checkbox" data-fx="particles">Частицы и связи</label>
+    <label class="check"><input type="checkbox" data-fx="spot">Подсветка под курсором</label>
+    <label class="check"><input type="checkbox" data-fx="tilt">3D-наклон карточек</label>
+    <label class="check"><input type="checkbox" data-fx="glow">Неоновое свечение</label>
+    <label class="check"><input type="checkbox" data-fx="shine">Блик на карточках</label>
+    <label class="check"><input type="checkbox" data-fx="enter">Анимация появления карточек</label>
+  </div>
+  <div class="pane" data-p="lib" hidden>
+    <label class="check"><input type="checkbox" id="sMin">Сворачивать gui-st при запуске игры</label>
+    <div id="folders"></div>
+    <div class="row"><button class="ghost" id="addFolder">Добавить папку с играми</button><button class="ghost" id="sData">Папка с данными</button></div>
+    <p class="hint">Игру можно добавить, перетащив её .exe или ярлык в окно. Время игры считается для запуска по .exe.</p>
+  </div>
+  <div class="pane" data-p="upd" hidden>
+    <p class="hint" id="updMsg"></p>
+    <div class="row"><button class="ghost" id="updCheck">Проверить обновления</button><button class="primary" id="updInstall" hidden>Перезапустить и обновить</button></div>
+    <p class="hint" id="ver"></p>
+  </div>
+  <div class="actions"><span class="spacer"></span><button class="primary" id="sClose">Готово</button></div>
+</dialog>
+<dialog id="dlgScan" class="wide">
+  <h2>Найденные игры</h2>
+  <p class="hint" id="scanInfo"></p>
+  <div class="scanlist" id="scanList"></div>
+  <div class="actions"><button class="ghost" id="scanAll">Выбрать все</button><span class="spacer"></span><button class="ghost" id="scanCancel">Закрыть</button><button class="primary" id="scanAdd">Добавить выбранные</button></div>
+</dialog>
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
